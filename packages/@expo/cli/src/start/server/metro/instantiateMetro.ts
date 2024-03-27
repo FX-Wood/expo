@@ -15,6 +15,7 @@ import { MetroBundlerDevServer } from './MetroBundlerDevServer';
 import { MetroTerminalReporter } from './MetroTerminalReporter';
 import { createDebugMiddleware } from './debugging/createDebugMiddleware';
 import { runServer } from './runServer-fork';
+import { withAtlas } from './withAtlas';
 import { withMetroMultiPlatformAsync } from './withMetroMultiPlatform';
 import { MetroDevServerOptions } from '../../../export/fork-bundleAsync';
 import { Log } from '../../../log';
@@ -219,6 +220,9 @@ export async function instantiateMetroAsync(
   prependMiddleware(middleware, debugMiddleware);
   middleware.use('/_expo/debugger', createJsInspectorMiddleware());
 
+  // Initialize Expo Atlas, if possible
+  const atlas = withAtlas({ projectRoot, middleware, metroConfig });
+
   const { server, metro } = await runServer(metroBundler, metroConfig, {
     // @ts-expect-error: Inconsistent `websocketEndpoints` type between metro and @react-native-community/cli-server-api
     websocketEndpoints: {
@@ -227,6 +231,10 @@ export async function instantiateMetroAsync(
     },
     watch: !isExporting && isWatchEnabled(),
   });
+
+  // Register Metro to listen for changes, like the HMRServer, for code changes
+  // @ts-expect-error
+  atlas?.registerMetro(metro);
 
   prependMiddleware(middleware, (req: ServerRequest, res: ServerResponse, next: ServerNext) => {
     // If the URL is a Metro asset request, then we need to skip all other middleware to prevent
