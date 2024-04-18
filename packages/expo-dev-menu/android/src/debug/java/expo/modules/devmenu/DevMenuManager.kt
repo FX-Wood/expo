@@ -84,7 +84,7 @@ object DevMenuManager : DevMenuManagerInterface, LifecycleEventListener {
     get() = delegateReactContext?.currentActivity
 
   private val hostReactContext: ReactContext?
-    get() = devMenuHost.reactHost.currentReactContext
+    get() = devMenuHost.currentReactContext
 
   private val hostActivity: Activity?
     get() = hostReactContext?.currentActivity
