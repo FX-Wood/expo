@@ -8,6 +8,8 @@
 
 ### 🎉 New features
 
+- Added `SQLiteProvider.assetSource` to import an existing database from assets.
+
 ### 🐛 Bug fixes
 
 ### 💡 Others
